@@ -5,6 +5,7 @@ import { Trust } from "@/components/landing/Trust";
 import { Metrics } from "@/components/landing/Metrics";
 import { Features } from "@/components/landing/Features";
 import { ProductPreview } from "@/components/landing/ProductPreview";
+import { KnowledgeGraph } from "@/components/landing/KnowledgeGraph";
 import { Personas } from "@/components/landing/Personas";
 import { CTA } from "@/components/landing/CTA";
 import { SiteFooter } from "@/components/landing/SiteFooter";
@@ -39,6 +40,7 @@ function LandingPage() {
         <Metrics />
         <Features />
         <ProductPreview />
+        <KnowledgeGraph />
         <Personas />
         <CTA />
       </main>
