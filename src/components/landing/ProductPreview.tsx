@@ -13,11 +13,11 @@ const trendData = [
 ];
 
 const results = [
-  { id: "US 11,482,931 B2", title: "Sparse mixture-of-experts routing for transformer inference", assignee: "Google LLC", date: "2024-03-12", score: 0.94, risk: "high" },
-  { id: "EP 3,591,201 A1", title: "Adaptive token pruning in attention layers", assignee: "DeepMind Tech.", date: "2023-11-08", score: 0.91, risk: "high" },
-  { id: "US 10,991,002 B1", title: "Dynamic expert gating with load-balancing loss", assignee: "Microsoft Corp.", date: "2023-06-21", score: 0.88, risk: "medium" },
-  { id: "JP 6,812,447 B2", title: "Conditional computation for neural network accelerators", assignee: "Sony Group", date: "2022-10-04", score: 0.82, risk: "medium" },
-  { id: "KR 10-2034-… A", title: "Hierarchical routing in heterogeneous MoE systems", assignee: "Samsung Electronics", date: "2022-04-18", score: 0.76, risk: "low" },
+  { id: "KR 10-2456789 B1", title: "이종 가속기 환경에서의 희소 MoE 라우팅 기법", assignee: "삼성전자(주)", date: "2024-03-12", score: 0.94, risk: "high", tag: "Technique", country: "KR" },
+  { id: "US 11,482,931 B2", title: "Sparse mixture-of-experts routing for transformer inference", assignee: "Google LLC", date: "2023-11-08", score: 0.91, risk: "high", tag: "Technique", country: "US" },
+  { id: "KR 10-2398012 B1", title: "추론 지연을 줄이기 위한 조건부 전문가 게이팅", assignee: "네이버클라우드(주)", date: "2023-06-21", score: 0.88, risk: "medium", tag: "Effect", country: "KR" },
+  { id: "US 10,991,002 B1", title: "Dynamic expert gating with load-balancing loss", assignee: "Microsoft Corp.", date: "2022-10-04", score: 0.82, risk: "medium", tag: "Problem", country: "US" },
+  { id: "KR 10-2287654 A", title: "이기종 MoE 시스템에서의 계층적 라우팅", assignee: "LG AI Research", date: "2022-04-18", score: 0.76, risk: "low", tag: "Technique", country: "KR" },
 ];
 
 const riskStyle = (r: string) =>
