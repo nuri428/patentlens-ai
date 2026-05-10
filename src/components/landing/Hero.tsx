@@ -89,7 +89,7 @@ export function Hero() {
                 <span className="h-2 w-2 rounded-full bg-white/20" />
               </div>
               <div className="font-mono text-[10.5px] text-white/40">
-                citation-graph · US 11,482,931
+                knowledge-graph · KR 10-2456789
               </div>
               <div className="rounded-sm bg-primary/20 px-1.5 py-0.5 font-mono text-[10px] text-primary">
                 LIVE
