@@ -142,12 +142,12 @@ export function ProductPreview() {
                       <Sparkles className="h-3.5 w-3.5" /> AI relevance
                     </div>
                     <p className="mt-2 text-[12.5px] leading-relaxed text-ink">
-                      Top results converge on <span className="font-medium">conditional expert routing</span>{" "}
-                      with auxiliary load-balancing loss. Claim 1 of US 11,482,931 substantially overlaps with
-                      claim 3 of EP 3,591,201 on the gating function.
+                      Top results converge on the <span className="font-medium">conditional expert routing</span>{" "}
+                      Technique. KR 10-2456789 EMPLOYS the same gating method that US 11,482,931 SOLVES,
+                      and ACHIEVES the inference-latency Effect cluster.
                     </p>
                     <div className="mt-3 flex flex-wrap gap-1.5">
-                      {["MoE", "Gating", "Load balance", "Inference latency", "Sparse activation"].map((t) => (
+                      {["Problem · 추론 지연", "Technique · MoE 라우팅", "Effect · throughput +", "IPC G06N 3/04", "KSIC J62"].map((t) => (
                         <span key={t} className="rounded-sm bg-accent px-1.5 py-0.5 text-[10.5px] font-medium text-accent-foreground">
                           {t}
                         </span>
