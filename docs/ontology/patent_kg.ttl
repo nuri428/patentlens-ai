@@ -1,0 +1,721 @@
+@prefix onto:    <http://greennuri.info/onto#> .
+@prefix ipc:     <http://greennuri.info/ipc/> .
+@prefix ksic:    <http://greennuri.info/ksic/> .
+@prefix patent:  <http://greennuri.info/patent/> .
+@prefix org:     <http://greennuri.info/org/> .
+@prefix tech:    <http://greennuri.info/tech/> .
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdf:     <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix schema:  <http://schema.org/> .
+@prefix skos:    <http://www.w3.org/2004/02/skos/core#> .
+
+# ============================================================
+# Patent Knowledge Graph Ontology
+# Source: Neo4j patentkg (n10s/neosemantics export + schema.py)
+# Namespace: http://greennuri.info/onto#
+# Neo4j DB: bolt://192.168.0.11:7687 / database: patentkg
+# Generated: 2026-05-05
+# ============================================================
+
+<http://greennuri.info/onto>
+    a owl:Ontology ;
+    dcterms:title "Patent Knowledge Graph Ontology"@en ,
+                  "특허 지식그래프 온톨로지"@ko ;
+    dcterms:description "OWL ontology for the Patent Board knowledge graph. Covers KR/US patents, semantic elements extracted by LLM, IPC/CPC/KSIC classification hierarchies, and organizational entities."@en ;
+    dcterms:creator "Patent Board Team" ;
+    owl:versionInfo "1.0.0" .
+
+
+# ============================================================
+# 1. Classes
+# ============================================================
+
+# ── Abstract Roots ───────────────────────────────────────────
+
+onto:PatentEntity
+    a owl:Class ;
+    rdfs:label "Patent Entity"@en ;
+    rdfs:comment "Abstract parent for all patent-related bibliographic entities."@en .
+
+onto:Agent
+    a owl:Class ;
+    rdfs:label "Agent"@en ;
+    rdfs:comment "Abstract parent for persons and organizations."@en .
+
+onto:SemanticElement
+    a owl:Class ;
+    rdfs:label "Semantic Element"@en ;
+    rdfs:comment "Abstract parent for LLM-extracted conceptual elements (problems, solutions, techniques, effects)."@en .
+
+onto:Classification
+    a owl:Class ;
+    rdfs:label "Classification"@en ;
+    rdfs:comment "Abstract parent for all classification schemes (IPC, CPC, KSIC, technology class, research area)."@en .
+
+
+# ── Patent Hierarchy ─────────────────────────────────────────
+
+onto:Patent
+    a owl:Class ;
+    rdfs:subClassOf onto:PatentEntity ;
+    rdfs:label "Patent"@en , "특허"@ko ;
+    rdfs:comment "A patent document (KR or US)."@en ;
+    rdfs:seeAlso schema:CreativeWork ;
+    skos:note "Neo4j label: :Patent. Subtyped as :KRPatent or :USPatent via additional label."@en .
+
+onto:KRPatent
+    a owl:Class ;
+    rdfs:subClassOf onto:Patent ;
+    rdfs:label "Korean Patent"@en , "한국 특허"@ko ;
+    skos:note "Neo4j labels: :Patent :KRPatent. language='ko'."@en .
+
+onto:USPatent
+    a owl:Class ;
+    rdfs:subClassOf onto:Patent ;
+    rdfs:label "US Patent"@en , "미국 특허"@ko ;
+    skos:note "Neo4j labels: :Patent :USPatent. language='en'."@en .
+
+onto:FamilyStub
+    a owl:Class ;
+    rdfs:subClassOf onto:Patent ;
+    rdfs:label "Family Stub"@en ;
+    rdfs:comment "A placeholder Patent node created to represent a foreign family member before its data is fully loaded. Excluded from RAG search results."@en ;
+    skos:note "Neo4j labels: :Patent :FamilyStub. Filter: WHERE NOT n:FamilyStub."@en .
+
+
+# ── Agent Hierarchy ──────────────────────────────────────────
+
+onto:Organization
+    a owl:Class ;
+    rdfs:subClassOf onto:Agent ;
+    rdfs:label "Organization"@en .
+
+onto:Corporation
+    a owl:Class ;
+    rdfs:subClassOf onto:Organization ;
+    rdfs:label "Corporation"@en , "기업"@ko ;
+    skos:note "Neo4j label: :Corporation. Cross-border SAME_AS links between KR and US entities."@en .
+
+onto:Person
+    a owl:Class ;
+    rdfs:subClassOf onto:Agent ;
+    rdfs:label "Person"@en .
+
+onto:Inventor
+    a owl:Class ;
+    rdfs:subClassOf onto:Person ;
+    rdfs:label "Inventor"@en , "발명자"@ko ;
+    skos:note "Neo4j label: :Inventor."@en .
+
+onto:ResearchProject
+    a owl:Class ;
+    rdfs:label "Research Project"@en , "연구과제"@ko ;
+    rdfs:comment "A research project / funded activity (not an Organization, but can fund patents). Mapped to schema:ResearchProject."@en ;
+    rdfs:seeAlso schema:ResearchProject ;
+    skos:note "Neo4j label: :ResearchProject."@en .
+
+
+# ── Semantic Elements (LLM-extracted) ───────────────────────
+
+onto:Problem
+    a owl:Class ;
+    rdfs:subClassOf onto:SemanticElement ;
+    rdfs:label "Problem"@en , "문제"@ko ;
+    rdfs:comment "A problem that a patent addresses."@en ;
+    skos:note "Neo4j label: :Problem."@en .
+
+onto:Solution
+    a owl:Class ;
+    rdfs:subClassOf onto:SemanticElement ;
+    rdfs:label "Solution"@en , "해결책"@ko ;
+    rdfs:comment "A solution proposed by a patent."@en ;
+    skos:note "Neo4j label: :Solution."@en .
+
+onto:Technique
+    a owl:Class ;
+    rdfs:subClassOf onto:Solution ;
+    rdfs:label "Technique"@en , "구현 기법"@ko ;
+    rdfs:comment "An implementation technique. A Technique is a concrete form of Solution (rdfs:subClassOf onto:Solution)."@en ;
+    skos:note "Neo4j label: :Technique. Neo4j rel: EMPLOYS (not HAS_TECHNIQUE)."@en .
+
+onto:Effect
+    a owl:Class ;
+    rdfs:subClassOf onto:SemanticElement ;
+    rdfs:label "Effect"@en , "효과"@ko ;
+    rdfs:comment "An effect or outcome achieved by a patent."@en ;
+    skos:note "Neo4j label: :Effect."@en .
+
+
+# ── Classification Hierarchy ─────────────────────────────────
+
+onto:IPCCode
+    a owl:Class ;
+    rdfs:subClassOf onto:Classification ;
+    rdfs:label "IPC Code"@en ;
+    rdfs:comment "An IPC code instance attached to a patent (section/class/subclass/group/subgroup)."@en ;
+    skos:note "Neo4j label: :IPC. Properties: ipc_main, section, class, subclass, group, subgroup."@en .
+
+onto:IPCHierarchyNode
+    a owl:Class ;
+    rdfs:subClassOf onto:Classification ;
+    rdfs:label "IPC Hierarchy Node"@en ;
+    rdfs:comment "A node in the IPC classification tree (taxonomy, not an instance). 17,055 CHILD_OF edges."@en ;
+    skos:note "Neo4j label: :IPC_Hierarchy. CHILD_OF direction: child → parent."@en .
+
+onto:CPCCode
+    a owl:Class ;
+    rdfs:subClassOf onto:Classification ;
+    rdfs:label "CPC Code"@en ;
+    skos:note "Neo4j label: :CPCCode."@en .
+
+onto:IndustryCode
+    a owl:Class ;
+    rdfs:subClassOf onto:Classification ;
+    rdfs:label "Industry Code (KSIC)"@en , "산업 분류 (KSIC)"@ko ;
+    skos:note "Neo4j label: :Industry. Approx. 19 top-level KSIC sectors."@en .
+
+onto:TechnologyClass
+    a owl:Class ;
+    rdfs:subClassOf onto:Classification ;
+    rdfs:label "Technology Class"@en , "기술 분류"@ko ;
+    rdfs:comment "Technology classification taxonomy node (stored as :Technology label in Neo4j for historical reasons)."@en ;
+    skos:note "Neo4j label: :Technology."@en .
+
+onto:Area
+    a owl:Class ;
+    rdfs:subClassOf onto:Classification ;
+    rdfs:label "Research Area"@en ;
+    rdfs:comment "Internal R&D area used by research funding agencies (~2K entries)."@en ;
+    skos:note "Neo4j label: :Area. For commercial industry, use onto:IndustryCode."@en .
+
+onto:Claim
+    a owl:Class ;
+    rdfs:label "Claim"@en ;
+    rdfs:comment "A patent claim node (independent or dependent)."@en ;
+    skos:note "Neo4j label: :Claim. Phase A: 2.67% coverage as of 2026-04-29."@en .
+
+onto:Keyword
+    a owl:Class ;
+    rdfs:label "Keyword"@en ;
+    skos:note "Neo4j label: :Keyword."@en .
+
+
+# ============================================================
+# 2. Object Properties (Relationship types)
+# ============================================================
+
+# ── Patent → Semantic ────────────────────────────────────────
+
+onto:solves
+    a owl:ObjectProperty ;
+    rdfs:label "solves"@en ;
+    rdfs:comment "A technique solves a problem. Mapped to Neo4j rel type SOLVES."@en ;
+    rdfs:domain onto:Technique ;
+    rdfs:range  onto:Problem ;
+    owl:inverseOf onto:solvedBy ;
+    skos:note "Neo4j: (t:Technique)-[:SOLVES]->(p:Problem)"@en .
+
+onto:solvedBy
+    a owl:ObjectProperty ;
+    rdfs:label "solved by"@en ;
+    rdfs:domain onto:Problem ;
+    rdfs:range  onto:Technique ;
+    owl:inverseOf onto:solves .
+
+onto:employs
+    a owl:ObjectProperty ;
+    rdfs:label "employs"@en ;
+    rdfs:comment "Mapped to Neo4j rel type EMPLOYS."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Technique ;
+    owl:inverseOf onto:employedBy ;
+    skos:note "Neo4j: (pat:Patent)-[:EMPLOYS]->(t:Technique). Not HAS_TECHNIQUE."@en .
+
+onto:employedBy
+    a owl:ObjectProperty ;
+    rdfs:label "employed by"@en ;
+    rdfs:domain onto:Technique ;
+    rdfs:range  onto:Patent ;
+    owl:inverseOf onto:employs .
+
+onto:achieves
+    a owl:ObjectProperty ;
+    rdfs:label "achieves"@en ;
+    rdfs:comment "Mapped to ACHIEVES."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Effect ;
+    skos:note "Neo4j: (pat:Patent)-[:ACHIEVES]->(e:Effect)"@en .
+
+onto:produces
+    a owl:ObjectProperty ;
+    rdfs:label "produces"@en ;
+    rdfs:comment "Mapped to PRODUCES."@en ;
+    rdfs:domain onto:Technique ;
+    rdfs:range  onto:Effect ;
+    skos:note "Neo4j: (t:Technique)-[:PRODUCES]->(e:Effect)"@en .
+
+onto:contributesTo
+    a owl:ObjectProperty ;
+    rdfs:label "contributes to"@en ;
+    rdfs:comment "A technique contributes to an effect. Mapped to CONTRIBUTES_TO. Not transitive — Technique→Effect relation is terminal in current schema."@en ;
+    rdfs:domain onto:Technique ;
+    rdfs:range  onto:Effect ;
+    skos:note "Neo4j: (t:Technique)-[:CONTRIBUTES_TO]->(e:Effect)"@en .
+
+onto:uses
+    a owl:ObjectProperty ;
+    rdfs:label "uses"@en ;
+    rdfs:comment "Mapped to USES."@en ;
+    rdfs:domain onto:Technique ;
+    rdfs:range  onto:Technique ;
+    skos:note "Neo4j: (t:Technique)-[:USES]->(t2:Technique)"@en .
+
+
+# ── Patent → Classification ──────────────────────────────────
+
+onto:classifiedByIPC
+    a owl:ObjectProperty ;
+    rdfs:label "classified by IPC"@en ;
+    rdfs:comment "Mapped to CLASSIFIED_BY_IPC."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:IPCCode ;
+    skos:note "Neo4j: (pat:Patent)-[:CLASSIFIED_BY_IPC]->(ipc:IPC)"@en .
+
+onto:classifiedByCPC
+    a owl:ObjectProperty ;
+    rdfs:label "classified by CPC"@en ;
+    rdfs:comment "Mapped to CLASSIFIED_BY_CPC."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:CPCCode ;
+    skos:note "Neo4j: (pat:Patent)-[:CLASSIFIED_BY_CPC]->(cpc:CPCCode)"@en .
+
+onto:mappedToKSIC
+    a owl:ObjectProperty ;
+    rdfs:label "mapped to KSIC"@en ;
+    rdfs:comment "Connects an IPC code to its corresponding KSIC industry. Populated from _ksic_hint.py mapping."@en ;
+    rdfs:domain onto:IPCCode ;
+    rdfs:range  onto:IndustryCode ;
+    skos:note "Neo4j: (ipc:IPC)-[:MAPPED_TO_KSIC]->(ind:Industry). Property chain: Patent→IPC→KSIC."@en .
+
+onto:appliedInIndustry
+    a owl:ObjectProperty ;
+    rdfs:label "applied in industry"@en ;
+    rdfs:comment "Commercial industry (KSIC, ~19 top-level sectors) that a patent is applied to. Automatically derived via property chain from IPC classification. For internal R&D areas, use inArea instead."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:IndustryCode ;
+    skos:note "Neo4j: (pat:Patent)-[:APPLIED_IN_INDUSTRY]->(ind:Industry)"@en .
+
+onto:belongsTo
+    a owl:ObjectProperty ;
+    rdfs:label "belongs to"@en ;
+    rdfs:comment "A patent belongs to a technology class. Mapped to Neo4j BELONGS_TO (direction: Patent → Technology)."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:TechnologyClass ;
+    skos:note "Neo4j: (pat:Patent)-[:BELONGS_TO]->(tc:Technology)"@en .
+
+onto:inArea
+    a owl:ObjectProperty ;
+    rdfs:label "in area"@en ;
+    rdfs:comment "Internal R&D area classification used by research funding agencies (~2K entries). For commercial industry classification, use appliedInIndustry instead."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Area ;
+    skos:note "Neo4j: (pat:Patent)-[:IN_AREA]->(area:Area)"@en .
+
+
+# ── IPC Hierarchy ────────────────────────────────────────────
+
+onto:inSubclass
+    a owl:ObjectProperty ;
+    rdfs:label "in subclass"@en ;
+    rdfs:comment "Links an IPC code instance to its position in the IPC hierarchy tree. 104,323 edges as of 2026-05-03."@en ;
+    rdfs:domain onto:IPCCode ;
+    rdfs:range  onto:IPCHierarchyNode ;
+    skos:note "Neo4j: (ipc:IPC)-[:IN_SUBCLASS]->(h:IPC_Hierarchy)"@en .
+
+onto:childOf
+    a owl:ObjectProperty , owl:TransitiveProperty ;
+    rdfs:label "child of"@en ;
+    rdfs:comment "Transitive hierarchy relation within the IPC classification tree. Direction: child → parent. 17,055 edges."@en ;
+    rdfs:domain onto:IPCHierarchyNode ;
+    rdfs:range  onto:IPCHierarchyNode ;
+    skos:note "Neo4j: (child:IPC_Hierarchy)-[:CHILD_OF]->(parent:IPC_Hierarchy)"@en .
+
+onto:hasSubclass
+    a owl:ObjectProperty , owl:TransitiveProperty ;
+    rdfs:label "has subclass"@en ;
+    rdfs:comment "Transitive hierarchy relation within the technology taxonomy (parent → child). Mapped to Neo4j HAS_SUBCLASS."@en ;
+    rdfs:domain onto:TechnologyClass ;
+    rdfs:range  onto:TechnologyClass ;
+    owl:inverseOf onto:childOf ;
+    skos:note "Neo4j: (parent:Technology)-[:HAS_SUBCLASS]->(child:Technology)"@en .
+
+
+# ── Patent → Agent ───────────────────────────────────────────
+
+onto:hasApplicant
+    a owl:ObjectProperty ;
+    rdfs:label "has applicant"@en ;
+    rdfs:comment "Mapped to HAS_APPLICANT."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Organization ;
+    skos:note "Neo4j: (pat:Patent)-[:HAS_APPLICANT]->(corp:Corporation)"@en .
+
+onto:hasOwner
+    a owl:ObjectProperty ;
+    rdfs:label "has owner"@en ;
+    rdfs:comment "Mapped to HAS_OWNER."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Organization ;
+    skos:note "Neo4j: (pat:Patent)-[:HAS_OWNER]->(corp:Corporation)"@en .
+
+onto:inventedBy
+    a owl:ObjectProperty ;
+    rdfs:label "invented by"@en ;
+    rdfs:comment "Mapped to INVENTED_BY."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Inventor ;
+    skos:note "Neo4j: (pat:Patent)-[:INVENTED_BY]->(inv:Inventor)"@en .
+
+onto:fundedBy
+    a owl:ObjectProperty ;
+    rdfs:label "funded by"@en ;
+    rdfs:comment "Mapped to FUNDED_BY."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:ResearchProject ;
+    skos:note "Neo4j: (pat:Patent)-[:FUNDED_BY]->(rp:ResearchProject)"@en .
+
+
+# ── Patent ↔ Patent ──────────────────────────────────────────
+
+onto:cites
+    a owl:ObjectProperty ;
+    rdfs:label "cites"@en ;
+    rdfs:comment "Mapped to CITES."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Patent ;
+    owl:inverseOf onto:citedBy ;
+    skos:note "Neo4j: (pat:Patent)-[:CITES]->(cited:Patent)"@en .
+
+onto:citedBy
+    a owl:ObjectProperty ;
+    rdfs:label "cited by"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Patent ;
+    owl:inverseOf onto:cites .
+
+onto:familyOf
+    a owl:ObjectProperty , owl:SymmetricProperty ;
+    rdfs:label "family of"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Patent ;
+    rdfs:comment "Bilateral patent family link. Symmetric."@en ;
+    skos:note "Neo4j: (pat1:Patent)-[:FAMILY_OF]->(pat2:Patent)"@en .
+
+onto:memberOf
+    a owl:ObjectProperty ;
+    rdfs:label "member of"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Patent ;
+    rdfs:comment "A patent is a family member of another patent."@en ;
+    skos:note "Neo4j: (pat:Patent)-[:MEMBER_OF]->(root:Patent)"@en .
+
+onto:relatedTo
+    a owl:ObjectProperty , owl:SymmetricProperty ;
+    rdfs:label "related to"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Patent ;
+    rdfs:comment "kNN similarity link (bge-m3 embedding). Populated by RELATED_TO backfill Beat."@en ;
+    skos:note "Neo4j: (pat:Patent)-[:RELATED_TO]->(similar:Patent)"@en .
+
+
+# ── Cross-entity ─────────────────────────────────────────────
+
+onto:sameAs
+    a owl:ObjectProperty , owl:SymmetricProperty ;
+    rdfs:label "same as"@en ;
+    rdfs:subPropertyOf owl:sameAs ;
+    rdfs:comment "Cross-border entity alignment (e.g. KR corporation ↔ US corporation)."@en ;
+    skos:note "Neo4j: (corp1:Corporation)-[:SAME_AS]->(corp2:Corporation)"@en .
+
+
+# ── Claim ─────────────────────────────────────────────────────
+
+onto:hasClaim
+    a owl:ObjectProperty ;
+    rdfs:label "has claim"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Claim ;
+    skos:note "Neo4j: (pat:Patent)-[:HAS_CLAIM]->(c:Claim)"@en .
+
+onto:dependsOn
+    a owl:ObjectProperty ;
+    rdfs:label "depends on"@en ;
+    rdfs:domain onto:Claim ;
+    rdfs:range  onto:Claim ;
+    rdfs:comment "Dependent claim → parent claim."@en ;
+    skos:note "Neo4j: (dep:Claim)-[:DEPENDS_ON]->(parent:Claim)"@en .
+
+
+# ── Corporation → Corporation ────────────────────────────────
+
+onto:hasCorporation
+    a owl:ObjectProperty ;
+    rdfs:label "has corporation"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  onto:Corporation .
+
+
+# ============================================================
+# 3. Datatype Properties
+# ============================================================
+
+# ── Patent ───────────────────────────────────────────────────
+
+onto:applicationNumber
+    a owl:DatatypeProperty ;
+    rdfs:label "application number"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  xsd:string .
+
+onto:documentNumber
+    a owl:DatatypeProperty ;
+    rdfs:label "document number"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  xsd:string ;
+    skos:note "Primary key in Neo4j Patent nodes."@en .
+
+onto:title
+    a owl:DatatypeProperty ;
+    rdfs:label "title"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  xsd:string .
+
+onto:abstractText
+    a owl:DatatypeProperty ;
+    rdfs:label "abstract"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  xsd:string .
+
+onto:language
+    a owl:DatatypeProperty ;
+    rdfs:label "language"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  xsd:string ;
+    rdfs:comment "ISO language code: 'ko' (KRPatent) or 'en' (USPatent)."@en .
+
+onto:country
+    a owl:DatatypeProperty ;
+    rdfs:label "country"@en ;
+    rdfs:comment "ISO country code (KR, US)."@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  xsd:string .
+
+onto:filingDate
+    a owl:DatatypeProperty ;
+    rdfs:label "filing date"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  xsd:string .
+
+onto:publicationDate
+    a owl:DatatypeProperty ;
+    rdfs:label "publication date"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  xsd:string .
+
+onto:priorityDate
+    a owl:DatatypeProperty ;
+    rdfs:label "priority date"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  xsd:string .
+
+onto:registrationStatus
+    a owl:DatatypeProperty ;
+    rdfs:label "registration status"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  xsd:string .
+
+onto:ipcCodes
+    a owl:DatatypeProperty ;
+    rdfs:label "ipc codes"@en ;
+    rdfs:domain onto:Patent ;
+    rdfs:range  xsd:string ;
+    skos:note "Denormalized list of IPC codes stored directly on Patent node for fast RAG retrieval."@en .
+
+onto:embedding
+    a owl:DatatypeProperty ;
+    rdfs:label "embedding"@en ;
+    rdfs:comment "Base64-encoded bge-m3 vector embedding."@en ;
+    rdfs:domain onto:SemanticElement ;
+    rdfs:range  xsd:string .
+
+
+# ── SemanticElement ──────────────────────────────────────────
+
+onto:description
+    a owl:DatatypeProperty ;
+    rdfs:label "description"@en ;
+    rdfs:domain onto:SemanticElement ;
+    rdfs:range  xsd:string .
+
+onto:confidence
+    a owl:DatatypeProperty ;
+    rdfs:label "confidence"@en ;
+    rdfs:domain onto:SemanticElement ;
+    rdfs:range  xsd:decimal .
+
+
+# ── IPC ──────────────────────────────────────────────────────
+
+onto:ipcMain
+    a owl:DatatypeProperty ;
+    rdfs:label "ipc main"@en ;
+    rdfs:domain onto:IPCCode ;
+    rdfs:range  xsd:string .
+
+onto:ipcSection
+    a owl:DatatypeProperty ;
+    rdfs:label "ipc section"@en ;
+    rdfs:domain onto:IPCCode ;
+    rdfs:range  xsd:string .
+
+onto:ipcClass
+    a owl:DatatypeProperty ;
+    rdfs:label "ipc class"@en ;
+    rdfs:domain onto:IPCCode ;
+    rdfs:range  xsd:string .
+
+onto:ipcSubclass
+    a owl:DatatypeProperty ;
+    rdfs:label "ipc subclass"@en ;
+    rdfs:domain onto:IPCCode ;
+    rdfs:range  xsd:string .
+
+onto:ipcGroup
+    a owl:DatatypeProperty ;
+    rdfs:label "ipc group"@en ;
+    rdfs:domain onto:IPCCode ;
+    rdfs:range  xsd:string .
+
+onto:ipcSubgroup
+    a owl:DatatypeProperty ;
+    rdfs:label "ipc subgroup"@en ;
+    rdfs:domain onto:IPCCode ;
+    rdfs:range  xsd:string .
+
+
+# ── IndustryCode ─────────────────────────────────────────────
+
+onto:ksicCode
+    a owl:DatatypeProperty ;
+    rdfs:label "KSIC code"@en ;
+    rdfs:domain onto:IndustryCode ;
+    rdfs:range  xsd:string .
+
+onto:ksicLabel
+    a owl:DatatypeProperty ;
+    rdfs:label "KSIC label"@en ;
+    rdfs:domain onto:IndustryCode ;
+    rdfs:range  xsd:string .
+
+
+# ── Claim ────────────────────────────────────────────────────
+
+onto:claimNumber
+    a owl:DatatypeProperty ;
+    rdfs:label "claim number"@en ;
+    rdfs:domain onto:Claim ;
+    rdfs:range  xsd:integer .
+
+onto:claimType
+    a owl:DatatypeProperty ;
+    rdfs:label "claim type"@en ;
+    rdfs:comment "independent or dependent"@en ;
+    rdfs:domain onto:Claim ;
+    rdfs:range  xsd:string .
+
+onto:claimText
+    a owl:DatatypeProperty ;
+    rdfs:label "claim text"@en ;
+    rdfs:domain onto:Claim ;
+    rdfs:range  xsd:string .
+
+
+# ============================================================
+# 4. OWL Axioms / Property Chains
+# ============================================================
+
+# Axiom: Patent → IPC → KSIC (property chain)
+[]  a owl:Axiom ;
+    rdfs:comment "Property chain: onto:classifiedByIPC o onto:mappedToKSIC → onto:appliedInIndustry. Used to derive the commercial industry of a patent from its IPC classification."@en .
+
+# Axiom: Technique ⊆ Solution
+onto:Technique rdfs:subClassOf onto:Solution .
+
+# Axiom: IPC_Hierarchy CHILD_OF* (transitive closure)
+onto:childOf a owl:TransitiveProperty .
+
+# Axiom: TechnologyClass HAS_SUBCLASS* (transitive closure)
+onto:hasSubclass a owl:TransitiveProperty .
+
+# Axiom: FamilyStub ⊆ Patent (placeholder, excluded from RAG)
+onto:FamilyStub rdfs:subClassOf onto:Patent .
+
+
+# ============================================================
+# 5. Neo4j Label ↔ OWL Class Mapping Notes
+# ============================================================
+#
+# Neo4j Label        → OWL Class
+# ─────────────────────────────────────────────────────────────
+# :Patent            → onto:Patent
+# :Patent :KRPatent  → onto:KRPatent
+# :Patent :USPatent  → onto:USPatent
+# :Patent :FamilyStub→ onto:FamilyStub
+# :Problem           → onto:Problem
+# :Solution          → onto:Solution
+# :Technique         → onto:Technique
+# :Effect            → onto:Effect
+# :IPC               → onto:IPCCode
+# :IPC_Hierarchy     → onto:IPCHierarchyNode
+# :CPCCode           → onto:CPCCode
+# :Industry          → onto:IndustryCode
+# :Technology        → onto:TechnologyClass  (historical naming)
+# :Area              → onto:Area
+# :Corporation       → onto:Corporation
+# :Inventor          → onto:Inventor
+# :ResearchProject   → onto:ResearchProject
+# :Claim             → onto:Claim
+# :Keyword           → onto:Keyword
+#
+# Neo4j Rel Type     → OWL ObjectProperty
+# ─────────────────────────────────────────────────────────────
+# SOLVES             → onto:solves
+# EMPLOYS            → onto:employs      (not HAS_TECHNIQUE)
+# ACHIEVES           → onto:achieves
+# PRODUCES           → onto:produces
+# CONTRIBUTES_TO     → onto:contributesTo
+# USES               → onto:uses
+# CLASSIFIED_BY_IPC  → onto:classifiedByIPC
+# CLASSIFIED_BY_CPC  → onto:classifiedByCPC
+# MAPPED_TO_KSIC     → onto:mappedToKSIC
+# APPLIED_IN_INDUSTRY→ onto:appliedInIndustry
+# BELONGS_TO         → onto:belongsTo
+# IN_AREA            → onto:inArea
+# IN_SUBCLASS        → onto:inSubclass
+# CHILD_OF           → onto:childOf
+# HAS_SUBCLASS       → onto:hasSubclass
+# HAS_APPLICANT      → onto:hasApplicant
+# HAS_OWNER          → onto:hasOwner
+# INVENTED_BY        → onto:inventedBy
+# FUNDED_BY          → onto:fundedBy
+# CITES              → onto:cites
+# CITED_BY           → onto:citedBy
+# FAMILY_OF          → onto:familyOf
+# MEMBER_OF          → onto:memberOf
+# RELATED_TO         → onto:relatedTo
+# SAME_AS            → onto:sameAs
+# HAS_CLAIM          → onto:hasClaim
+# DEPENDS_ON         → onto:dependsOn
