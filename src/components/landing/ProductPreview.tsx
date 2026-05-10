@@ -1,10 +1,11 @@
 import { motion } from "framer-motion";
 import {
-  Search, Sparkles, FileText, Filter, ChevronRight, Bookmark, ShieldAlert, Activity,
+  Search, Sparkles, ChevronRight, ShieldAlert, Activity,
 } from "lucide-react";
 import {
   Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid,
 } from "recharts";
+import { useLanguage } from "@/lib/i18n";
 
 const trendData = [
   { y: "2017", filings: 1240 }, { y: "2018", filings: 1480 }, { y: "2019", filings: 1820 },
@@ -28,29 +29,24 @@ const riskStyle = (r: string) =>
     : "bg-success/10 text-success border-success/20";
 
 export function ProductPreview() {
+  const { t } = useLanguage();
+
   return (
-    <section className="border-b border-border bg-surface">
+    <section id="workspace" className="border-b border-border bg-surface">
       <div className="mx-auto max-w-7xl px-6 py-24">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <div className="text-[11px] font-semibold uppercase tracking-wider text-primary">
-              Inside the workspace
+              {t.preview.eyebrow}
             </div>
             <h2 className="mt-3 text-[34px] font-semibold tracking-tight text-ink">
-              Evidence-first analysis,<br />from query to brief.
+              {t.preview.title}
             </h2>
             <p className="mt-4 text-[15px] leading-relaxed text-ink-soft">
-              Search results, citation graphs, claim diffs, and trend charts share a
-              single context — so every AI insight is anchored in the underlying
-              document corpus.
+              {t.preview.body}
             </p>
             <ul className="mt-6 space-y-3 text-[13.5px] text-ink">
-              {[
-                "Hybrid retrieval with claim-level reranking",
-                "Risk scoring on novelty and inventive step",
-                "Side-by-side claim comparison editor",
-                "Export-ready briefs with verifiable citations",
-              ].map((p) => (
+              {t.preview.bullets.map((p) => (
                 <li key={p} className="flex items-start gap-2">
                   <ChevronRight className="mt-0.5 h-4 w-4 text-primary" />
                   {p}
@@ -92,17 +88,17 @@ export function ProductPreview() {
                 <span className="rounded-sm border border-border bg-muted px-2 py-0.5 text-[10.5px] font-medium text-ink-soft">
                   CPC G06N3/04
                 </span>
-                <button className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-2 py-1 text-[11.5px] text-ink-soft hover:bg-muted">
-                  <Filter className="h-3 w-3" /> Filters
-                </button>
+                <span className="rounded-sm border border-border bg-surface px-2 py-1 text-[11px] font-medium text-ink-muted">
+                  {t.preview.sampleLabel}
+                </span>
               </div>
 
               <div className="grid grid-cols-12">
                 {/* Results */}
                 <div className="col-span-7 border-r border-border">
                   <div className="flex items-center justify-between border-b border-border px-5 py-2 text-[11px] font-medium uppercase tracking-wider text-ink-muted">
-                    <div>5 of 1,284 results</div>
-                    <div>Reranked · v3.2</div>
+                    <div>{t.preview.results}</div>
+                    <div>{t.preview.reranked}</div>
                   </div>
                   <ul className="divide-y divide-border">
                     {results.map((r) => (
@@ -139,12 +135,10 @@ export function ProductPreview() {
                 <div className="col-span-5 bg-surface">
                   <div className="border-b border-border px-5 py-3">
                     <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-primary">
-                      <Sparkles className="h-3.5 w-3.5" /> AI relevance
+                      <Sparkles className="h-3.5 w-3.5" /> {t.preview.aiRelevance}
                     </div>
                     <p className="mt-2 text-[12.5px] leading-relaxed text-ink">
-                      Top results converge on the <span className="font-medium">conditional expert routing</span>{" "}
-                      Technique. KR 10-2456789 EMPLOYS the same gating method that US 11,482,931 SOLVES,
-                      and ACHIEVES the inference-latency Effect cluster.
+                      {t.preview.aiBody}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-1.5">
                       {["Problem · 추론 지연", "Technique · MoE 라우팅", "Effect · throughput +", "IPC G06N 3/04", "KSIC J62"].map((t) => (
@@ -158,7 +152,7 @@ export function ProductPreview() {
                   <div className="border-b border-border px-5 py-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-[11px] font-medium uppercase tracking-wider text-ink-muted">
-                        <Activity className="h-3.5 w-3.5" /> Filing trend
+                        <Activity className="h-3.5 w-3.5" /> {t.preview.filingTrend}
                       </div>
                       <div className="font-mono text-[10.5px] text-success">+33% YoY</div>
                     </div>
@@ -184,16 +178,9 @@ export function ProductPreview() {
                   <div className="flex items-center justify-between px-5 py-3 text-[11.5px]">
                     <span className="inline-flex items-center gap-1.5 text-ink-soft">
                       <ShieldAlert className="h-3.5 w-3.5 text-warning" />
-                      2 high-risk claims detected
+                      {t.preview.riskDetected}
                     </span>
-                    <div className="flex items-center gap-1.5">
-                      <button className="inline-flex items-center gap-1 rounded-md border border-border bg-surface px-2 py-1 text-ink-soft hover:bg-muted">
-                        <Bookmark className="h-3 w-3" /> Save
-                      </button>
-                      <button className="inline-flex items-center gap-1 rounded-md bg-navy px-2 py-1 font-medium text-white">
-                        <FileText className="h-3 w-3" /> Brief
-                      </button>
-                    </div>
+                    <span className="text-ink-muted">{t.preview.summaryLabel}</span>
                   </div>
                 </div>
               </div>

@@ -1,8 +1,11 @@
 import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, ShieldCheck, Lock } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 import { PatentGraph } from "./PatentGraph";
 
 export function Hero() {
+  const { t } = useLanguage();
+
   return (
     <section className="relative overflow-hidden border-b border-border bg-navy text-white">
       <div className="absolute inset-0 bg-grid-navy opacity-60" />
@@ -18,7 +21,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[12px] font-medium text-white/80"
           >
             <Sparkles className="h-3.5 w-3.5 text-primary" />
-            AI-native patent intelligence — now in private beta
+            {t.hero.badge}
           </motion.div>
 
           <motion.h1
@@ -27,11 +30,10 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.05 }}
             className="mt-6 text-[44px] font-semibold leading-[1.05] tracking-tight text-white md:text-[58px]"
           >
-            The strategic operating
+            {t.hero.titleTop}
             <br />
-            system for{" "}
             <span className="bg-gradient-to-r from-white to-[#A6B6FF] bg-clip-text text-transparent">
-              patent intelligence.
+              {t.hero.titleBottom}
             </span>
           </motion.h1>
 
@@ -41,37 +43,21 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.12 }}
             className="mt-6 max-w-xl text-[15.5px] leading-relaxed text-white/70"
           >
-            PatentLens unifies semantic search, prior art analysis, and competitive
-            landscape mapping into a single AI workspace — built for IP attorneys
-            and R&D strategists who need evidence, not summaries.
+            {t.hero.body}
           </motion.p>
 
-          <motion.div
+          <motion.p
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.18 }}
-            className="mt-9 flex flex-wrap items-center gap-3"
+            className="mt-9 max-w-xl rounded-md border border-white/10 bg-white/5 px-4 py-3 text-[13.5px] leading-relaxed text-white/75"
           >
-            <a
-              href="#"
-              className="group inline-flex items-center gap-2 rounded-md bg-primary px-5 py-3 text-[14px] font-medium text-primary-foreground shadow-elevated transition hover:brightness-110"
-            >
-              Request enterprise demo
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-            </a>
-            <a
-              href="#"
-              className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/5 px-5 py-3 text-[14px] font-medium text-white/90 transition hover:bg-white/10"
-            >
-              See live product tour
-            </a>
-          </motion.div>
+            {t.hero.note}
+          </motion.p>
 
           <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-2 text-[12px] text-white/55">
-            <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5" /> SOC 2 Type II</span>
-            <span className="inline-flex items-center gap-1.5"><Lock className="h-3.5 w-3.5" /> ISO 27001</span>
-            <span>140M+ global patents indexed</span>
-            <span>EPO · USPTO · KIPO · JPO · WIPO</span>
+            <span>{t.hero.patents}</span>
+            <span>{t.hero.offices}</span>
           </div>
         </div>
 

@@ -9,6 +9,7 @@ import { KnowledgeGraph } from "@/components/landing/KnowledgeGraph";
 import { Personas } from "@/components/landing/Personas";
 import { CTA } from "@/components/landing/CTA";
 import { SiteFooter } from "@/components/landing/SiteFooter";
+import { LanguageProvider } from "@/lib/i18n";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -32,19 +33,21 @@ export const Route = createFileRoute("/")({
 
 function LandingPage() {
   return (
-    <div className="min-h-screen bg-background">
-      <SiteHeader />
-      <main>
-        <Hero />
-        <Trust />
-        <Metrics />
-        <Features />
-        <ProductPreview />
-        <KnowledgeGraph />
-        <Personas />
-        <CTA />
-      </main>
-      <SiteFooter />
-    </div>
+    <LanguageProvider>
+      <div className="min-h-screen bg-background">
+        <SiteHeader />
+        <main>
+          <Hero />
+          <Trust />
+          <Metrics />
+          <Features />
+          <ProductPreview />
+          <KnowledgeGraph />
+          <Personas />
+          <CTA />
+        </main>
+        <SiteFooter />
+      </div>
+    </LanguageProvider>
   );
 }

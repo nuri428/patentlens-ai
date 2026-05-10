@@ -1,30 +1,16 @@
 import { ScanSearch } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
-const cols = [
-  {
-    title: "Platform",
-    items: ["Patent Search", "Prior Art", "Trend Analysis", "Competitor Intel", "Report Builder"],
-  },
-  {
-    title: "Solutions",
-    items: ["Patent Attorneys", "R&D Strategy", "IP Portfolio", "Litigation Support"],
-  },
-  {
-    title: "Resources",
-    items: ["Documentation", "API Reference", "Changelog", "Trust & Security"],
-  },
-  {
-    title: "Company",
-    items: ["About", "Customers", "Careers", "Contact"],
-  },
-];
+const footerTargets = ["#features", "#workspace", "#personas"] as const;
 
 export function SiteFooter() {
+  const { t } = useLanguage();
+
   return (
     <footer className="border-t border-border bg-surface">
       <div className="mx-auto max-w-7xl px-6 py-16">
-        <div className="grid grid-cols-2 gap-10 md:grid-cols-6">
-          <div className="col-span-2">
+        <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
+          <div className="max-w-sm">
             <div className="flex items-center gap-2.5">
               <div className="flex h-8 w-8 items-center justify-center rounded-md bg-navy text-white">
                 <ScanSearch className="h-4 w-4" />
@@ -32,33 +18,23 @@ export function SiteFooter() {
               <span className="text-[15px] font-semibold tracking-tight">PatentLens</span>
             </div>
             <p className="mt-4 max-w-xs text-[13px] leading-relaxed text-ink-soft">
-              An AI-native patent intelligence platform for IP teams, attorneys, and R&D strategists.
+              {t.footer.body}
             </p>
           </div>
-          {cols.map((c) => (
-            <div key={c.title}>
-              <div className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
-                {c.title}
-              </div>
-              <ul className="space-y-2">
-                {c.items.map((i) => (
-                  <li key={i}>
-                    <a className="text-[13px] text-ink-soft hover:text-ink" href="#">
-                      {i}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <nav className="grid grid-cols-2 gap-x-8 gap-y-3 text-[13px] text-ink-soft sm:grid-cols-4">
+            {t.footer.links.map((label, index) => (
+              <a key={label} href={footerTargets[index]} className="transition-colors hover:text-ink">
+                {label}
+              </a>
+            ))}
+          </nav>
         </div>
         <div className="mt-12 flex flex-col items-start justify-between gap-3 border-t border-border pt-6 text-[12px] text-ink-muted md:flex-row md:items-center">
-          <div>© {new Date().getFullYear()} PatentLens, Inc. All rights reserved.</div>
+          <div>© {new Date().getFullYear()} PatentLens, Inc. {t.footer.rights}</div>
           <div className="flex gap-5">
-            <a href="#" className="hover:text-ink">Privacy</a>
-            <a href="#" className="hover:text-ink">Terms</a>
-            <a href="#" className="hover:text-ink">SOC 2</a>
-            <a href="#" className="hover:text-ink">DPA</a>
+            {t.footer.legal.map((item) => (
+              <span key={item}>{item}</span>
+            ))}
           </div>
         </div>
       </div>

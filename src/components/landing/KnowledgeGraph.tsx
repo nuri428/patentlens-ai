@@ -1,4 +1,5 @@
 import { Database, Network, Layers3, Sparkles } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 const entities = [
   { label: "Patent", note: "KR · US · FamilyStub", color: "bg-primary/15 text-primary border-primary/25" },
@@ -17,44 +18,42 @@ const relations = [
   "MAPPED_TO_KSIC", "INVENTED_BY", "HAS_APPLICANT", "FUNDED_BY",
 ];
 
-const stats = [
-  { icon: Database, k: "Knowledge graph", v: "Neo4j · n10s exporter" },
-  { icon: Network,  k: "Semantic similarity", v: "bge-m3 embeddings · RELATED_TO kNN" },
-  { icon: Layers3,  k: "Classification chain", v: "Patent → IPC → KSIC (property chain)" },
-  { icon: Sparkles, k: "LLM extraction", v: "Problem · Solution · Technique · Effect" },
-];
+const statIcons = [Database, Network, Layers3, Sparkles];
 
 export function KnowledgeGraph() {
+  const { t } = useLanguage();
+
   return (
     <section className="border-b border-border bg-background">
       <div className="mx-auto max-w-7xl px-6 py-24">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-12">
           <div className="lg:col-span-5">
             <div className="text-[11px] font-semibold uppercase tracking-wider text-primary">
-              Underlying knowledge graph
+              {t.knowledge.eyebrow}
             </div>
             <h2 className="mt-3 text-[34px] font-semibold tracking-tight text-ink">
-              Not just a search index —<br />a structured patent ontology.
+              {t.knowledge.title}
             </h2>
             <p className="mt-4 text-[15px] leading-relaxed text-ink-soft">
-              PatentLens is built on an OWL-modeled knowledge graph spanning Korean and
-              US patents. Every document is decomposed into <strong className="text-ink">Problem · Solution · Technique · Effect</strong>{" "}
-              semantic elements, linked through the IPC hierarchy and KSIC industries via
-              an OWL property chain.
+              {t.knowledge.body}
             </p>
 
             <ul className="mt-8 space-y-4">
-              {stats.map((s) => (
+              {t.knowledge.stats.map((s, index) => {
+                const Icon = statIcons[index];
+
+                return (
                 <li key={s.k} className="flex items-start gap-3">
                   <div className="mt-0.5 flex h-8 w-8 items-center justify-center rounded-md border border-border bg-surface-elevated text-primary">
-                    <s.icon className="h-4 w-4" />
+                    <Icon className="h-4 w-4" />
                   </div>
                   <div>
                     <div className="text-[13.5px] font-medium text-ink">{s.k}</div>
                     <div className="text-[12.5px] text-ink-soft">{s.v}</div>
                   </div>
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </div>
 
@@ -71,7 +70,7 @@ export function KnowledgeGraph() {
 
               <div className="mt-5">
                 <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
-                  Core entities
+                  {t.knowledge.entities}
                 </div>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                   {entities.map((e) => (
@@ -88,7 +87,7 @@ export function KnowledgeGraph() {
 
               <div className="mt-6">
                 <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
-                  Relationship types
+                  {t.knowledge.relations}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {relations.map((r) => (
