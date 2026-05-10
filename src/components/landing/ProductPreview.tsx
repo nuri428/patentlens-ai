@@ -108,18 +108,24 @@ export function ProductPreview() {
                     {results.map((r) => (
                       <li key={r.id} className="px-5 py-3.5 transition-colors hover:bg-muted/40">
                         <div className="flex items-center justify-between gap-3">
-                          <span className="font-mono text-[11.5px] text-ink-soft">{r.id}</span>
-                          <span className="font-mono text-[11px] text-primary">
-                            sim {r.score.toFixed(2)}
-                          </span>
+                          <div className="flex items-center gap-2">
+                            <span className={`rounded-sm border px-1 py-0.5 font-mono text-[9.5px] font-semibold uppercase ${r.country === "KR" ? "border-primary/30 bg-primary/10 text-primary" : "border-border bg-muted text-ink-soft"}`}>
+                              {r.country}
+                            </span>
+                            <span className="font-mono text-[11.5px] text-ink-soft">{r.id}</span>
+                          </div>
+                          <span className="font-mono text-[11px] text-primary">sim {r.score.toFixed(2)}</span>
                         </div>
                         <div className="mt-1 line-clamp-1 text-[13.5px] font-medium text-ink">
                           {r.title}
                         </div>
                         <div className="mt-1.5 flex items-center gap-2 text-[11.5px] text-ink-soft">
-                          <span>{r.assignee}</span>
+                          <span className="truncate">{r.assignee}</span>
                           <span>·</span>
                           <span>{r.date}</span>
+                          <span className="rounded-sm bg-accent px-1.5 py-0.5 text-[10px] font-medium text-accent-foreground">
+                            {r.tag}
+                          </span>
                           <span className={`ml-auto rounded-sm border px-1.5 py-0.5 text-[10px] font-medium uppercase ${riskStyle(r.risk)}`}>
                             {r.risk === "high" ? "novelty risk" : r.risk === "medium" ? "overlap" : "low"}
                           </span>
