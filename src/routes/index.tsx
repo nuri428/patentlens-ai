@@ -40,6 +40,7 @@ function LandingPage() {
         <Metrics />
         <Features />
         <ProductPreview />
+        <KnowledgeGraph />
         <Personas />
         <CTA />
       </main>
